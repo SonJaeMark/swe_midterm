@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 from views.components.text_field import TextField
 from views.components.button import Button
 from views.components.link_text import LinkText
@@ -68,22 +69,30 @@ class LoginView(tk.Frame):
         
         # Basic validation against placeholders and empty inputs
         if not identifier or identifier == "e.g. john.doe@mail.com":
-            print("Login failed: Please enter a valid email or username.")
+            messagebox.showerror("Login failed", "Enter your email address or username.", parent=self)
             return
             
         if not password:
-            print("Login failed: Password cannot be empty.")
+            messagebox.showerror("Login failed", "Enter your password.", parent=self)
             return
             
         # Authenticate using the service layer (following layered architecture)
         user = user_service.login(identifier, password)
         
         if user:
-            print(f"Authentication successful! Welcome back, {user.get('username')}.")
+            messagebox.showinfo(
+                "Login successful",
+                f"Welcome back, {user.get('username')}.",
+                parent=self
+            )
             # Trigger success callback or router transition if defined
             if hasattr(self, 'on_login_success'):
                 self.on_login_success(user)
             elif hasattr(self.master, 'show_dashboard'):
                 self.master.show_dashboard()
         else:
-            print("Login failed: Invalid email/username or password.")
+            messagebox.showerror(
+                "Login failed",
+                "The email/username or password is incorrect.",
+                parent=self
+            )

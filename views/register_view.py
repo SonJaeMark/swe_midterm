@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 from views.components.text_field import TextField
 from views.components.button import Button
 from views.components.link_text import LinkText
@@ -116,16 +117,16 @@ class RegisterView(tk.Frame):
 
         # Basic validation against default placeholder strings
         if not first_name or first_name == "First Name":
-            print("Validation Error: First name is required.")
+            messagebox.showerror("Registration failed", "Enter your first name.", parent=self)
             return
         if not last_name or last_name == "Last Name":
-            print("Validation Error: Last name is required.")
+            messagebox.showerror("Registration failed", "Enter your last name.", parent=self)
             return
         if not email or email == "john.doe@mail.com" or "@" not in email:
-            print("Validation Error: A valid email address is required.")
+            messagebox.showerror("Registration failed", "Enter a valid email address.", parent=self)
             return
         if not password or password == "Choose Password":
-            print("Validation Error: Password is required.")
+            messagebox.showerror("Registration failed", "Enter a password.", parent=self)
             return
 
         # Automatically generate a unique username from the email prefix
@@ -149,9 +150,17 @@ class RegisterView(tk.Frame):
         )
 
         if user_id:
-            print(f"Registration successful! Patient created with User ID: {user_id}")
+            messagebox.showinfo(
+                "Registration successful",
+                "Your patient account has been created. You can now log in.",
+                parent=self
+            )
             # Automatically redirect back to the login view upon successful registration
             if self.switch_to_login:
                 self.switch_to_login()
         else:
-            print("Registration failed. Email or username might already exist in the database.")
+            messagebox.showerror(
+                "Registration failed",
+                "The account could not be created. The email or username may already be in use.",
+                parent=self
+            )
