@@ -6,6 +6,7 @@ from views.staff_view import StaffView
 from views.doctor_view import DoctorView
 from service.medical_staff_service import get_medical_staff_by_user_id
 from tkinter import messagebox
+from config.init_db import initialize_database
 
 class MediQueueApp(tk.Tk):
     def __init__(self):
@@ -57,5 +58,12 @@ class MediQueueApp(tk.Tk):
         self.current_view.pack(fill="both", expand=True)
 
 if __name__ == "__main__":
+    if not initialize_database():
+        messagebox.showerror(
+            "Database setup failed",
+            "MediQueue could not initialize its database. Start MySQL and check the database configuration."
+        )
+        raise SystemExit(1)
+
     app = MediQueueApp()
     app.mainloop()

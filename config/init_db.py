@@ -31,6 +31,7 @@ def initialize_database():
     dummy_sql_path = os.path.join(root_dir, 'dummy.sql')
 
     connection = None
+    cursor = None
     try:
         # Connect directly to the XAMPP MySQL server
         connection = mysql.connector.connect(
@@ -51,28 +52,36 @@ def initialize_database():
                 
                 # 1. Execute db.sql to create database and tables
                 print("Executing db.sql...")
-                if execute_sql_file(cursor, db_sql_path):
-                    print("Successfully created database and tables from db.sql[cite: 1].")
+                if not execute_sql_file(cursor, db_sql_path):
+                    return False
+                print("Successfully created database and tables from db.sql.")
                 
                 # 2. Execute dummy.sql since the database is new
                 print("Executing dummy.sql for initial data...")
-                if execute_sql_file(cursor, dummy_sql_path):
-                    print("Successfully populated database with dummy data.")
+                if not execute_sql_file(cursor, dummy_sql_path):
+                    return False
+                print("Successfully populated database with dummy data.")
             else:
                 print("'mediqueue_db' already exists. Skipping dummy.sql execution.")
-                # Optional: Safely re-run db.sql to ensure any missing structural changes apply
                 print("Verifying schema with db.sql...")
-                execute_sql_file(cursor, db_sql_path)
+                if not execute_sql_file(cursor, db_sql_path):
+                    return False
 
             connection.commit()
             print("Database initialization process finished successfully.")
+            return True
 
     except Error as e:
         print(f"Error while initializing the database: {e}")
+        return False
+    except (OSError, UnicodeError) as e:
+        print(f"Error reading database setup files: {e}")
+        return False
         
     finally:
-        if connection and connection.is_connected():
+        if cursor:
             cursor.close()
+        if connection and connection.is_connected():
             connection.close()
             print("Database connection closed.")
 
